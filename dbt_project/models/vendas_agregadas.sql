@@ -1,0 +1,1 @@
+-- O Gemini deve gerar a query de agregação de vendas aqui

@@ -1,0 +1,4 @@
+version: 2
+models:
+  - name: vendas_agregadas
+    description: "Aguardando documentação do agente..."

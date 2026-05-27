@@ -1,0 +1,6 @@
+gen_ecommerce_lab:
+  outputs:
+    dev:
+      type: duckdb
+      path: '../db/gen_ecommerce_lab.duckdb' 
+  target: dev

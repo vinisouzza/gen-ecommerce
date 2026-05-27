@@ -1,0 +1,7 @@
+name: 'gen_ecommerce_lab'
+version: '1.0'
+profile: 'gen_ecommerce_lab' 
+
+models:
+  gen_ecommerce_lab:
+    +materialized: table 
