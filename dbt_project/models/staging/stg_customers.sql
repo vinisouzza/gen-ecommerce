@@ -1,0 +1,3 @@
+-- Esta query seleciona e limpa a tabela `raw_customers`. Ela remove linhas onde `customer_city` ou `customer_state` são nulos e garante que cada `customer_id` seja único, mantendo apenas as colunas especificadas.
+
+SELECT customer_id, customer_unique_id, customer_city, customer_state FROM raw_customers WHERE customer_city IS NOT NULL AND customer_state IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY customer_id) = 1

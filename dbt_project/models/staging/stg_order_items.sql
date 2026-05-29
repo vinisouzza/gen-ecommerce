@@ -1,0 +1,3 @@
+-- Esta query seleciona todos os itens de pedido da tabela raw_order_items, filtrando registros onde order_id ou product_id são nulos. Além disso, converte as colunas price e freight_value para o tipo numérico DECIMAL(10, 2), usando TRY_CAST para lidar com possíveis valores não numéricos sem erro.
+
+SELECT order_id, order_item_id, product_id, seller_id, shipping_limit_date, TRY_CAST(price AS DECIMAL(10, 2)) AS price, TRY_CAST(freight_value AS DECIMAL(10, 2)) AS freight_value FROM raw_order_items WHERE order_id IS NOT NULL AND product_id IS NOT NULL

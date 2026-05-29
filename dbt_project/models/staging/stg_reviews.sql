@@ -1,0 +1,3 @@
+-- Esta query seleciona todos os campos da tabela raw_reviews, convertendo as colunas review_creation_date e review_answer_timestamp para o tipo TIMESTAMP.
+
+SELECT review_id, order_id, customer_id, product_id, CAST(review_creation_date AS TIMESTAMP) AS review_creation_date, CAST(review_answer_timestamp AS TIMESTAMP) AS review_answer_timestamp, review_score, review_comment_title, review_comment_message FROM raw_reviews

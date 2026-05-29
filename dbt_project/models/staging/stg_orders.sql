@@ -1,0 +1,3 @@
+-- Esta query limpa a tabela raw_orders, convertendo colunas de data para TIMESTAMP, calculando os dias para entrega e removendo linhas duplicadas por order_id, mantendo a entrada mais antiga.
+
+SELECT order_id, customer_id, order_status, CAST(order_purchase_timestamp AS TIMESTAMP) AS order_purchase_timestamp, CAST(order_approved_at AS TIMESTAMP) AS order_approved_at, CAST(order_delivered_customer_date AS TIMESTAMP) AS order_delivered_customer_date, CAST(order_estimated_delivery_date AS TIMESTAMP) AS order_estimated_delivery_date, DATE_DIFF('day', CAST(order_purchase_timestamp AS TIMESTAMP), CAST(order_delivered_customer_date AS TIMESTAMP)) AS dias_para_entrega FROM raw_orders QUALIFY ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY order_purchase_timestamp) = 1
