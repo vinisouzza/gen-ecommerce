@@ -10,3 +10,4 @@ db/
 *.db
 *.duckdb
 .DS_Store
+data/*.csv
