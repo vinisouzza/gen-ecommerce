@@ -28,21 +28,21 @@ def gerar_sql_e_doc_gemini(descricao: str) -> AIQueryResponse:
     Você é um engenheiro de dados especialista em DuckDB SQL.
     Escreva uma query SQL que atenda estritamente a este requisito: "{descricao}"
     
-    A tabela de origem se chama 'raw_vendas' e possui as colunas: 
-    id (INT), data (DATE), produto (VARCHAR), quantidade (INT), preco_unitario (DOUBLE).
+    Temos duas tabelas de origem:
+    1. 'raw_vendas' com colunas: id (INT), data (DATE), produto (VARCHAR), quantidade (INT), preco_unitario (DOUBLE).
+    2. 'raw_metas' com colunas: produto (VARCHAR), meta_receita (DOUBLE).
     
     Sua resposta DEVE ser estruturada conforme o JSON Schema especificado. 
     Não adicione tags de markdown do tipo ```sql na query. Retorne apenas o código limpo.
     """
     
-    # Executa a chamada forçando a saída mapeada no Pydantic
     response = client.beta.chat.completions.parse(
-        model="gemini-2.5-flash", # Modelo Gemini rápido e disponível no plano gratuito
+        model="gemini-2.5-flash",
         messages=[
             {"role": "user", "content": prompt}
         ],
         response_format=AIQueryResponse,
-        temperature=0.0 # Temperatura zero para maior consistência e zero criatividade indesejada
+        temperature=0.0
     )
     
     # O SDK retorna uma lista de choices; usamos a primeira opção válida.
