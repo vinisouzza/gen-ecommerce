@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import duckdb
-from dagster import asset, Definitions, AssetExecutionContext
+from dagster import asset, Definitions, AssetExecutionContext, multiprocess_executor
 from ai_agent import gerar_sql_e_doc_gemini
 import subprocess
 
@@ -19,13 +19,26 @@ def raw_vendas() -> None:
     conn.execute("CREATE OR REPLACE TABLE raw_vendas AS SELECT * FROM df")
     conn.close()
 
+@asset(compute_kind="DuckDB")
+def raw_metas() -> None:
+    """Novo asset: Carrega as metas de vendas por produto"""
+    conn = duckdb.connect("db/gen_ecommerce_lab.duckdb")
+    df = pd.read_csv("data/metas.csv")
+    conn.execute("CREATE OR REPLACE TABLE raw_metas AS SELECT * FROM df")
+    conn.close()
+
 # ---------------------------------------------------------------------
 # Asset 2: Agente Generativo (Geração de Código e Atualização de Metadados)
 # ---------------------------------------------------------------------
-@asset(deps=[raw_vendas], compute_kind="Gemini")
+@asset(deps=[raw_vendas, raw_metas], compute_kind="Gemini")
 def vendas_agregadas_sql(context: AssetExecutionContext) -> str:
     """Chama a IA para obter a query SQL ideal e atualiza a documentação no schema.yml do dbt."""
-    requisito = "Calcule a receita total gerada por produto (quantidade * preco_unitario) e ordene do maior para o menor."
+    requisito = """
+    Calcule a receita total por produto (quantidade * preco_unitario) da tabela raw_vendas. 
+    Faça um JOIN com a tabela raw_metas pelo 'produto'.
+    Traga as colunas: produto, receita_total, meta_receita.
+    Crie também uma coluna chamada 'atingiu_meta' com o valor 'SIM' caso a receita seja maior ou igual a meta, e 'NAO' caso contrário.
+    """
     
     # Invoca o agente Gemini
     ai_response = gerar_sql_e_doc_gemini(requisito)
@@ -67,5 +80,6 @@ def dbt_run(context: AssetExecutionContext) -> None:
 
 # Central de Definições que o Dagster lê para montar o Grafo
 defs = Definitions(
-    assets=[raw_vendas, vendas_agregadas_sql, dbt_run]
+    assets=[raw_vendas, raw_metas, vendas_agregadas_sql, dbt_run],
+    executor=multiprocess_executor.configured({"max_concurrent": 1})
 )
